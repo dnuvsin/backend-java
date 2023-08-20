@@ -1,6 +1,7 @@
 package com.example.demo.controller;
 
 import java.util.ArrayList;
+import java.util.Iterator;
 import java.util.List;
 import java.util.Optional;
 
@@ -17,13 +18,23 @@ import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RestController;
 
 import com.example.demo.model.Employee;
+import com.example.demo.model.Role;
+import com.example.demo.model.Skill;
 import com.example.demo.repository.EmployeeRepository;
+import com.example.demo.repository.RoleRepository;
+import com.example.demo.repository.SkillRepository;
 
 @RestController
 public class EmployeeController {
 
 	@Autowired
 	EmployeeRepository employeeRepository;
+
+	@Autowired
+	RoleRepository roleRepository;
+
+	@Autowired
+	SkillRepository skillRepository;
 
 	@GetMapping("/employee")
 	public ResponseEntity<Object> getEmployee() {
@@ -37,11 +48,21 @@ public class EmployeeController {
 	}
 
 	@PostMapping("/employee")
-	public ResponseEntity<Object> addEmployee(@RequestBody Employee Body)
+	public ResponseEntity<Object> addEmployee(@RequestBody Employee body)
 	// Employee addEmployee(@RequestBody Employee body)
 	{
 		try {
-			Employee employee = employeeRepository.save(Body);
+			Optional<Role> role = roleRepository.findById(4);
+
+			body.setRole(role.get());
+
+			Employee employee = employeeRepository.save(body);
+			
+			for (Skill skill : body.getSkills()) {
+				skill.setEmployee(employee);
+				skillRepository.save(skill);
+				
+			}
 			return new ResponseEntity<>(employee, HttpStatus.CREATED);
 			// employeeRepository.save(body);
 		} catch (Exception e) {
@@ -95,14 +116,12 @@ public class EmployeeController {
 
 				return new ResponseEntity<>(employeeEdit, HttpStatus.OK);
 			} else {
-				return new ResponseEntity<>("employee not found",HttpStatus.BAD_REQUEST);
+				return new ResponseEntity<>("employee not found", HttpStatus.BAD_REQUEST);
 			}
 		} catch (Exception e) {
 			return new ResponseEntity<>("INTERNAL SERVER ERROR", HttpStatus.INTERNAL_SERVER_ERROR);
 		}
-		
 
-		
 	}
 
 	@DeleteMapping("/employee/{employeeId}")
@@ -111,18 +130,16 @@ public class EmployeeController {
 			Optional<Employee> employee = employeeRepository.findById(employeeId);
 
 			if (employee.isPresent()) {
-				 employeeRepository.delete(employee.get());
+				employeeRepository.delete(employee.get());
 //				employeeRepository.deleteById(employeeId);
-				return new ResponseEntity<>("Delete Success",HttpStatus.OK);
+				return new ResponseEntity<>("Delete Success", HttpStatus.OK);
 
 			} else {
-				return new ResponseEntity<>("employee not found",HttpStatus.BAD_REQUEST);
+				return new ResponseEntity<>("employee not found", HttpStatus.BAD_REQUEST);
 			}
 		} catch (Exception e) {
 			return new ResponseEntity<>("INTERNAL SERVER ERROR", HttpStatus.INTERNAL_SERVER_ERROR);
 		}
-
-		
 
 	}
 
