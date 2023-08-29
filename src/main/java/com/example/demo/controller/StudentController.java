@@ -60,8 +60,13 @@ public class StudentController {
 
 				Student studentEdit = student.get();
 
-				studentEdit.setStudentName(body.getStudentName());
-				studentEdit.setStudentEmail(body.getStudentEmail());
+				if (body.getStudentName() != null) {
+					studentEdit.setStudentName(body.getStudentName());
+				}
+				if (body.getStudentEmail() != null) {
+					studentEdit.setStudentEmail(body.getStudentEmail());
+				}
+				
 
 				studentRepository.save(studentEdit);
 
