@@ -16,10 +16,5 @@ public class BackendJavaApplication {
 		
 	
 	}
-	
-	@GetMapping("/")
-	public String index() {
-		return "Backend Reserve Hotel";
-	}
 
 }
